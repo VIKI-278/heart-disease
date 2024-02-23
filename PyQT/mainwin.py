@@ -28,7 +28,7 @@ class MainUI(QWidget, Ui_mainwin):
         self.restingecg.addItems(['normal','ST','LVH'])
         self.angina.addItems(['Yes','No'])
         self.stslope.addItems(['up','down','flat'])
-        self.pushButton.clicked.connect(self.pred_clicked)
+        self.pushButton.clicked.connect(self.pred_clicked) #what happens when prdict button is clicked
 
     def pred_clicked(self):
         input_fields = {
@@ -39,7 +39,8 @@ class MainUI(QWidget, Ui_mainwin):
             "Oldpeak": self.oldpeak
         }
 
-        empty_fields = [name for name, field in input_fields.items() if (field.toPlainText() == "" or (not field.toPlainText().isnumeric()))]
+        #check for empty data inputs and has correct data type
+        empty_fields = [name for name, field in input_fields.items() if (field.toPlainText() == "" or (not field.toPlainText().isnumeric()))] 
 
         if empty_fields:
             field_names = empty_fields[0]
@@ -50,6 +51,7 @@ class MainUI(QWidget, Ui_mainwin):
             self.predict()
             
     def predict(self):
+        #data pre processing
         age = int(self.age.toPlainText())
         sex = str(self.sex.currentText())
         chestpaintype = str(self.chestpain.currentText())
@@ -111,10 +113,15 @@ class MainUI(QWidget, Ui_mainwin):
             st_slope_flat = 0
             st_slope_up = 0
 
+        #final Data array
+
         data = np.array([[age,restingbp,cholestrol,int(fbs),maxHR,oldpeak,int(sex_M),int(chestpaintype_ATA),int(chestpaintype_NAP),
                           int(chestpaintype_TA),int(restingecg_normal),int(restingecg_st),int(exang),int(st_slope_flat),int(st_slope_up)]])
+        
         #Load the exported model
-        loaded_model = load(r"C:\Users\Admin\Desktop\DSBA\Others\Portfolio prjt\Heart disease\ML\heartmodel.joblib")
+
+        loaded_model = load(r"C:\Users\Admin\Desktop\DSBA\Others\Portfolio prjt\Heart disease\ML\heartmodel.joblib") # change this to your path
+
         res = loaded_model.predict(data)[0]
         if res == 0:
             res_prob = round(loaded_model.predict_proba(data)[0][0] * 100,2) 
